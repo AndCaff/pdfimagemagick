@@ -32,21 +32,24 @@ return new Promise((resolve,reject)=>{
 
 }
 
-const folder="/tmp/ramdisk/"
+const folder="/app/ramdisk/"
 
   
   const upload = multer({ dest: folder })
 
   app.post('/pdfconvert',upload.single('file'), function (req, res, next) {
-      
+      console.log(req.file)
     let originalname=req.file.originalname
     let filepath=req.file.path
     const filename=req.file.filename
     const imagebase=req.file.filename+".png"
     fs.mkdirSync(filepath+'1')
+   
     asyncIm([filepath,'-colorspace', 'RGB', '-alpha' ,'remove' ,filepath+'1'+"/"+imagebase]).then((()=>{
+     
       let list=fs.readdirSync(filepath+'1'+"/")
-       let lista=[]
+      
+      let lista=[]
         for(let elem of list){
             
            lista.push (filepath+'1'+"/"+elem)
@@ -60,13 +63,18 @@ const folder="/tmp/ramdisk/"
           fs.rm(filepath+'1',()=>{}),
           fs.rm(filepath,()=>{})
 
+        }).catch((err)=>{console.log(err)
+        
+        
         })
           
 
     }
-    )  
+    )
    
-  )})
+  ).catch((err)=>{console.log(err) 
+  res.status(500)
+  })})
 
 
 
